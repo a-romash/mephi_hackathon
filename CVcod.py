@@ -42,6 +42,6 @@ while cap.isOpened():
         cv.aruco.drawDetectedMarkers(frame, corners, ids)
         cv.imshow('Detected Markers', frame)
         cv.waitKey(0)
-        cv.destroyAllWindows()
+        cv.destroyAllWindows()#
 
 
