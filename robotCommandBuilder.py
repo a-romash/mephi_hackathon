@@ -23,6 +23,7 @@ def solve(tiles_to_remove: list[ArUcoTile], tiles_to_build: list[ArUcoTile], x_p
 
     """
     План действий:
+        0. Убираем ненужные тайлы
         1. Проверяем, свободно ли поле для построения пирамидки
         2. Убираем лишние тайлы, если нет
         3. Строим пирамидку
@@ -61,7 +62,7 @@ def check_field(tiles: list[ArUcoTile], x_pyramid: float, y_pyramid: float, size
 
     return to_remove
 
-# TODO: сделать доделать
+
 def remove(tiles: list[ArUcoTile]) -> list[Command]:
     """
     Description:
@@ -80,12 +81,12 @@ def remove(tiles: list[ArUcoTile]) -> list[Command]:
     # Начальная высота над тайлом (для безопасного перемещения)
     Z_ABOVE = 100.0
 
-    # Высота для захвата тайла (чуть выше его поверхности, т.к. z у плитки — её верх)
-    Z_PICK = 30.0
+    # Высота для захвата тайла
+    Z_PICK = 4.0
 
     # Координаты зоны сброса (вне основной области 300x300)
     DROP_X, DROP_Y = 330, 330
-    Z_DROP = 5.0
+    Z_DROP = 9.0
 
     for tile in tiles:
         # Подлететь сверху
