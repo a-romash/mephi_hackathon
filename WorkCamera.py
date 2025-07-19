@@ -11,7 +11,7 @@ while True:
 
     # if frame is read correctly ret is True
     if not ret:
-        print("Can't receive frame (stream end?). Exiting ..")
+        print("Can't receive frame (stream end?). Exiting ...")
         break
 # Our operations on the frame come here
     gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
