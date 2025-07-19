@@ -1,11 +1,6 @@
 from models.arUcoTile import ArUcoTile
 from models.commands import Command, MoveTo, ToolVacuumOn, ToolVacuumOff, ToolRotateTo
 
-"""
-Введём следующие предположения:
-    1. Лишние тайлы размером 80x80x4мм
-    2. Угол тайлов -- наименьший угол, на который надо повернуть тайл, чтобы его стороны стали параллельны осям плоскости
-"""
 
 def solve(tiles_to_remove: list[ArUcoTile], tiles_to_build: list[ArUcoTile], x_pyramid: float, y_pyramid: float) -> list[Command]:
     """
@@ -31,8 +26,11 @@ def solve(tiles_to_remove: list[ArUcoTile], tiles_to_build: list[ArUcoTile], x_p
 
     commands: list[Command] = []
 
+    # Убираем ненужные тайлы
     commands += remove(tiles_to_remove)
 
+    # Поправляем тайлы, чтобы они были ориентированы правильно
+    commands += orient_tiles(tiles_to_build)
 
 
 def check_field(tiles: list[ArUcoTile], x_pyramid: float, y_pyramid: float, size: int) -> list[ArUcoTile]:
@@ -108,5 +106,49 @@ def remove(tiles: list[ArUcoTile]) -> list[Command]:
 
         # Подняться снова
         commands.append(MoveTo(DROP_X, DROP_Y, Z_ABOVE))
+
+    return commands
+
+
+def orient_tiles(tiles: list[ArUcoTile]) -> list[Command]:
+    """
+    Description:
+        Генерирует команды для переориентации тайлов: выравнивает каждый тайл так, 
+        чтобы его стороны были параллельны осям координат.
+        Считается, что tile.ang лежит в диапазоне [-45, 45] и указывает отклонение от корректной ориентации.
+
+    Attributes:
+        tiles: list[ArUcoTile] - список тайлов, которые нужно переориентировать
+
+    Returns:
+        list[Command] - список команд для переориентации всех заданных тайлов
+    """
+
+    commands: list[Command] = []
+
+    # Высоты
+    Z_ABOVE = 100.0
+    Z_PICK = 4.0
+
+    for tile in tiles:
+        # Если уже правильно ориентирован — пропускаем
+        if abs(tile.ang) < 1e-1:
+            continue
+
+        # 1. Подлететь
+        commands.append(MoveTo(tile.x, tile.y, Z_ABOVE))
+
+        # 2. Захватить тайл
+        commands.append(MoveTo(tile.x, tile.y, Z_PICK))
+        commands.append(ToolVacuumOn())
+
+        # 3. Повернуть на tile.ang (выровнять)
+        commands.append(ToolRotateTo(tile.ang))
+
+        # 4. Положить обратно
+        commands.append(ToolVacuumOff())
+
+        # 5. Поднимаем
+        commands.append(MoveTo(tile.x, tile.y, Z_ABOVE))
 
     return commands
